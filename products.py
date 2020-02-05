@@ -18,7 +18,9 @@ class products:
         self.data_products = []
 
     def get_api_data(self):
+        i = 0
         for categories_key, categories_values in CATEGORIES.items():
+            print(categories_key)
             if categories_key:
                 data = requests.get(categories_values + "1.json")
                 data_json = data.json()
@@ -45,8 +47,8 @@ class products:
                         store = prod["stores"]
                     except KeyError:
                         store = "unknown"
-                    self.data_products.append([name, url, categories_key, store, score])
-
+                    self.data_products.append([name, url, (i+1), store, score])
+            i += 1
     def insert_data(self):
         mycursor = mydb.cursor()
         mycursor.execute("CREATE DATABASE IF NOT EXISTS p5")
@@ -66,6 +68,7 @@ class products:
         mydb.commit()
 
     def get_products(self, categorie):
+        print(categorie)
         mycursor = mydb.cursor()
         sql = "SELECT * FROM product WHERE categorie = %s"
         categorie = (categorie,)

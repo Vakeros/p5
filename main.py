@@ -1,6 +1,7 @@
 import mysql.connector
 from constant import CATEGORIES
 from constant import PRODUCTS
+from constant import CAT
 import os
 import requests
 import json
@@ -23,7 +24,7 @@ def remplace():
                 categorie_name.append(i)
                 value += 1
             choice = int(input("Indiquez le numéro d'une categorie :"))
-            data = db.get_products(categorie_name[choice])
+            data = db.get_products(CAT[categorie_name[choice]])
             for i in data:
                 if i[PRODUCTS["name"]] != "" and i[PRODUCTS["name"]] != "unknown":
                     products_list.append(i)

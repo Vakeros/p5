@@ -12,3 +12,8 @@ PRODUCTS = {
     "store": 4,
     "score": 5
 }
+CAT = {
+        "snacks": 1,
+        "boissons": 2,
+        "surgeles": 3
+}
