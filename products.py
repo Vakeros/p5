@@ -1,6 +1,7 @@
 import mysql.connector
 
 from constant import CATEGORIES
+from constant import PAGE_COUNT
 from constant import PRODUCTS
 import requests
 
@@ -20,35 +21,22 @@ class products:
     def get_api_data(self):
         i = 0
         for categories_key, categories_values in CATEGORIES.items():
-            print(categories_key)
             if categories_key:
-                data = requests.get(categories_values + "1.json")
-                data_json = data.json()
-                products_data_json = data_json["products"]
+                for y in range(1, PAGE_COUNT+1):
+                    data = requests.get(categories_values + str(y) + ".json")
+                    data_json = data.json()
+                    products_data_json = data_json["products"]
 
-                for prod in products_data_json:
-                    try:
-                        name = prod["generic_name_fr"]
-                    except KeyError:
-                        """" try:
-                            name = prod["generic_name"]
-                        except KeyError:
-                            print("dead") """
-                        name = ""
-                    try:
-                        score = prod["nutriscore_score"]
-                    except KeyError:
-                        score = "X"
-                    try:
-                        url = prod["url"]
-                    except KeyError:
-                        url = "unknown"
-                    try:
-                        store = prod["stores"]
-                    except KeyError:
-                        store = "unknown"
-                    self.data_products.append([name, url, (i+1), store, score])
+                    for prod in products_data_json:
+                        name = prod.get("generic_name_fr", "")
+                        score = prod.get("nutriscore_grade", "X")
+                        url = prod.get("url")
+                        store = prod.get("stores", "")
+
+                        if name != "" and name != "unknown" and score != "X" and store != "":
+                            self.data_products.append([name, url, (i+1), store, score])
             i += 1
+
     def insert_data(self):
         mycursor = mydb.cursor()
         mycursor.execute("CREATE DATABASE IF NOT EXISTS p5")
@@ -56,9 +44,12 @@ class products:
         mycursor.execute("CREATE TABLE IF NOT EXISTS `p5`.`product` ( `id` INT NOT NULL AUTO_INCREMENT ,"
                          " `name` VARCHAR(255) NOT NULL,"
                          " `url` VARCHAR(1000) NOT NULL UNIQUE,"
-                         " `categorie` VARCHAR(255) NOT NULL,"
+                         " `categorie` int(11) NOT NULL,"
                          " `store` VARCHAR(255) NOT NULL,"
-                         " `score` VARCHAR(255) , PRIMARY KEY (`id`)) ENGINE = InnoDB;")
+                         " `score` VARCHAR(255), PRIMARY KEY (`id`), INDEX cat (categorie)) ENGINE = InnoDB;")
+        mycursor.execute("CREATE TABLE IF NOT EXISTS `p5`.`user` ( `id` INT NOT NULL AUTO_INCREMENT ,"
+                         " `product` INT(11) , PRIMARY KEY (`id`)) ENGINE = InnoDB;"
+                        )
         sql = "INSERT IGNORE INTO product (name, url, categorie, store ,score) VALUES (%s, %s, %s, %s, %s)"
         val = []
         for product in self.data_products:
@@ -66,6 +57,16 @@ class products:
 
         mycursor.executemany(sql, val)
         mydb.commit()
+
+    def get_cat(self):
+        mycursor = mydb.cursor()
+        sql = "SELECT * FROM category"
+        mycursor.execute(sql)
+        data = mycursor.fetchall()
+        cat_List = {}
+        for element in data:
+            cat_List[element[1]] = element[0]
+        return cat_List
 
     def get_products(self, categorie):
         print(categorie)
