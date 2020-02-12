@@ -1,8 +1,9 @@
+"""content all constant values"""
+import mysql.connector
 CATEGORIES = {"viandes": "https://fr.openfoodfacts.org/category/viandes/",
               "boissons": "https://fr.openfoodfacts.org/categorie/boissons/",
               "surgeles": "https://fr.openfoodfacts.org/categorie/surgeles/"
              }
-
 PAGE_COUNT = 5
 PRODUCTS = {
     "id": 0,

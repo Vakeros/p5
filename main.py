@@ -1,17 +1,15 @@
-from constant import CATEGORIES
-from constant import PRODUCTS
-from products import products
-from constant import SCORE
+"""main"""
+from constant import CATEGORIES, PRODUCTS, SCORE
+from db import DB
 
-db = products()
-db.get_api_data()
-db.insert_data()
+db = DB()
 len_categorie = len(CATEGORIES)
 categorie_name = []
 cat = db.get_cat()
 
 
 def remplace():
+    """remplace selected product"""
     try:
         while True:
             products_list = []
@@ -21,17 +19,17 @@ def remplace():
                 categorie_name.append(i)
                 value += 1
 
-            choice = int(input("Indiquez le numéro d'une categorie :"))
-            data = db.get_products(cat[categorie_name[choice]])
+            entry = int(input("Indiquez le numéro d'une categorie :"))
+            data = db.get_products(cat[categorie_name[entry]])
             for i in data:
-                    products_list.append(i)
+                products_list.append(i)
 
             for index, data in enumerate(products_list):
                 print(str(index) + " " + data[PRODUCTS["name"]])
 
-            choice = int(input("Indiquez l'id'd'un produit :"))
+            entry = int(input("Indiquez l'id'd'un produit :"))
             for data in products_list:
-                if SCORE[data[PRODUCTS["score"]]] < SCORE[products_list[choice][PRODUCTS["score"]]]:
+                if SCORE[data[PRODUCTS["score"]]] < SCORE[products_list[entry][PRODUCTS["score"]]]:
                     print("nous vous proposons " + data[PRODUCTS["name"]] + " achetable a " + data[PRODUCTS["store"]])
                     if input("souhaitez vous enregistrez cette proposition ? y/n :") == "y":
                         db.client_save_product(data[PRODUCTS["id"]])
@@ -43,6 +41,7 @@ def remplace():
 
 
 def get_client_data():
+    """get client substitute products"""
     data = db.client_get_product()
     for i in data:
         print("name: " + i[0] + " store: " + i[2] + " score: " + str(i[3]))
@@ -52,10 +51,10 @@ while True:
     try:
         print("1: Quel aliment souhaitez-vous remplacer ?")
         print("2: Retrouver mes aliments substitués.")
-        choice = int(input())
-        if choice == 1:
+        entry = int(input())
+        if entry == 1:
             remplace()
-        elif choice == 2:
+        elif entry == 2:
             get_client_data()
         else:
             print("entrer une valeur entre 1 et 2")
