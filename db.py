@@ -109,7 +109,7 @@ class DB:
     def client_get_product():
         """get client substitue products"""
         mycursor = mydb.cursor()
-        sql = "SELECT name,url,store,score FROM product,user WHERE product.id =  user.product"
+        sql = "SELECT name,url,store,score FROM product INNER JOIN user ON product.id =  user.product"
         mycursor.execute(sql)
         data = mycursor.fetchall()
         return data
