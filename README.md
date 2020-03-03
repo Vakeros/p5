@@ -2,7 +2,7 @@
 
 ## Getting Started
 ```
-1 Make with python 3.7. Try other versions at your risk
+1 Make with python 3.7. Try others version at your risk
 
 2 install mysql
 
