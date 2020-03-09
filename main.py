@@ -1,6 +1,8 @@
 """main"""
 
 from substitute import Substitute
+from api import API
+API.load()
 SUB = Substitute()
 
 

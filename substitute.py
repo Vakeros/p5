@@ -1,6 +1,7 @@
 """substitue"""
-from constant import CATEGORIES, PRODUCTS, SCORE
+from constant import PRODUCTS, SCORE
 from db import DB
+from api import API
 
 
 class Substitute:
@@ -8,7 +9,7 @@ class Substitute:
 
     def __init__(self):
         self.data_base = DB()
-        self.len_categorie = len(CATEGORIES)
+        self.len_categorie = 0
         self.categories_name = []
         self.category = self.data_base.get_cat()
 
@@ -19,8 +20,8 @@ class Substitute:
 
                 products_list = []
                 value = 0
-                for i in CATEGORIES:
-                    print(str(value) + ": " + i)
+                for i in API.categories:
+                    print(str(value) + ": " + i["name"])
                     self.categories_name.append(i)
                     value += 1
 

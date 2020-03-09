@@ -1,8 +1,6 @@
 """db"""
 import mysql.connector
-import requests
-from constant import CATEGORIES, PAGE_COUNT
-from products import Product
+from api import API
 
 MYDB = mysql.connector.connect(
     user="root",
@@ -19,10 +17,10 @@ class DB:
         self.create_data_base()
         self.get_api_data()
         self.insert_data()
-
     @staticmethod
     def create_data_base():
         """create data base and table"""
+        print("Creation de la base de donnée ...")
         mycursor = MYDB.cursor()
         mycursor.execute("CREATE DATABASE IF NOT EXISTS p5")
         MYDB.database = "p5"
@@ -55,33 +53,11 @@ class DB:
                             ON DELETE NO ACTION
                             ON UPDATE NO ACTION;
                             """)
+        print("Done")
 
     def get_api_data(self):
         """get data from openfoodfact API"""
-        i = 0
-        print("Loading ...")
-        for categories_key, categories_values in CATEGORIES.items():
-            if categories_key:
-                for page in range(1, PAGE_COUNT+1):
-                    data = requests.get(categories_values + str(page) + ".json")
-                    data_json = data.json()
-                    products_data_json = data_json["products"]
-
-                    for prod in products_data_json:
-                        product = Product([
-                            prod.get("generic_name_fr", ""),
-                            prod.get("url"),
-                            prod.get("stores", ""),
-                            prod.get("nutriscore_grade", "X"),
-                            i+1
-                        ])
-
-                        if prod.get("generic_name_fr", "") != ""\
-                                and prod.get("generic_name_fr", "") != "unknown"\
-                                and prod.get("nutriscore_grade", "X") != "X"\
-                                and prod.get("stores", "") != "":
-                            self.data_products.append(product)
-            i += 1
+        self.data_products = API.products
 
     def insert_data(self):
         """create and insert data into database"""
@@ -93,8 +69,8 @@ class DB:
         val = []
         cat_val = []
 
-        for cat in CATEGORIES:
-            cat_val.append(["", cat])
+        for cat in API.categories:
+            cat_val.append(["", cat["name"]])
 
         for product in self.data_products:
             val.append(product.get_all())
