@@ -30,19 +30,31 @@ class DB:
                          " ( `id` INT NOT NULL AUTO_INCREMENT ,"
                          " `name` VARCHAR(255) NOT NULL,"
                          " `url` VARCHAR(1000) NOT NULL UNIQUE,"
-                         " `categorie` VARCHAR(255) NOT NULL,"
+                         " `categorie` INT NOT NULL,"
                          " `store` VARCHAR(255) NOT NULL,"
-                         " `score` VARCHAR(255), PRIMARY KEY (`id`),"
-                         " INDEX cat (categorie)) ENGINE = InnoDB;")
+                         " `score` VARCHAR(255), PRIMARY KEY (`id`))"
+                         "  ENGINE = InnoDB;")
         mycursor.execute("CREATE TABLE IF NOT EXISTS `p5`.`user`"
                          " ( `id` INT NOT NULL AUTO_INCREMENT ,"
                          " `product` INT(11) , PRIMARY KEY (`id`)) ENGINE = InnoDB;"
                         )
         mycursor.execute("CREATE TABLE IF NOT EXISTS `p5`.`category`"
                          " ( `id` INT NOT NULL AUTO_INCREMENT ,"
-                         " `categorie` VARCHAR(255) UNIQUE ,"
+                         " `categorie` VARCHAR(255)  ,"
                          " PRIMARY KEY (`id`)) ENGINE = InnoDB;"
                          )
+        mycursor.execute("""ALTER TABLE product ADD CONSTRAINT FK_CAT
+                          FOREIGN KEY IF NOT EXISTS (categorie)
+                          REFERENCES Category (id)
+                          ON DELETE NO ACTION
+                          ON UPDATE NO ACTION;
+                          """)
+        mycursor.execute("""ALTER TABLE user ADD CONSTRAINT FK_U
+                            FOREIGN KEY IF NOT EXISTS (product)
+                            REFERENCES product (id)
+                            ON DELETE NO ACTION
+                            ON UPDATE NO ACTION;
+                            """)
 
     def get_api_data(self):
         """get data from openfoodfact API"""
@@ -50,8 +62,8 @@ class DB:
         print("Loading ...")
         for categories_key, categories_values in CATEGORIES.items():
             if categories_key:
-                for y in range(1, PAGE_COUNT+1):
-                    data = requests.get(categories_values + str(y) + ".json")
+                for page in range(1, PAGE_COUNT+1):
+                    data = requests.get(categories_values + str(page) + ".json")
                     data_json = data.json()
                     products_data_json = data_json["products"]
 
@@ -87,8 +99,9 @@ class DB:
         for product in self.data_products:
             val.append(product.get_all())
 
-        mycursor.executemany(sql, val)
         mycursor.executemany(cat_sql, cat_val)
+        mycursor.executemany(sql, val)
+
         MYDB.commit()
 
     @staticmethod
@@ -109,17 +122,17 @@ class DB:
         print(categorie)
         mycursor = MYDB.cursor()
         sql = "SELECT * FROM product WHERE categorie = %s"
-        categorie = (categorie,)
+        categorie = (categorie+1,)
         mycursor.execute(sql, categorie)
         data = mycursor.fetchall()
         return data
 
     @staticmethod
-    def client_save_product(id):
+    def client_save_product(pid):
         """save client substitue products"""
         mycursor = MYDB.cursor()
         sql = "INSERT INTO user (product) VALUES (%s)"
-        mycursor.execute(sql, (id,))
+        mycursor.execute(sql, (pid,))
         MYDB.commit()
 
     @staticmethod

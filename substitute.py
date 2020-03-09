@@ -5,11 +5,12 @@ from db import DB
 
 class Substitute:
     """Substitue"""
+
     def __init__(self):
-        self.db = DB()
+        self.data_base = DB()
         self.len_categorie = len(CATEGORIES)
         self.categories_name = []
-        self.category = self.db.get_cat()
+        self.category = self.data_base.get_cat()
 
     def remplace(self):
         """remplace selected product"""
@@ -25,7 +26,7 @@ class Substitute:
 
                 entry = int(input("entrer le numéro d'une categorie :"))
                 try:
-                    data = self.db.get_products(self.category[self.categories_name[entry]])
+                    data = self.data_base.get_products(entry)
                 except IndexError:
                     self.remplace()
                 for i in data:
@@ -36,7 +37,8 @@ class Substitute:
 
                 entry = int(input("Indiquez l'id'd'un produit :"))
                 for data in products_list:
-                    if SCORE[data[PRODUCTS["score"]]] < SCORE[products_list[entry][PRODUCTS["score"]]]:
+                    score = SCORE[products_list[entry][PRODUCTS["score"]]]
+                    if SCORE[data[PRODUCTS["score"]]] < score:
                         print(
                             "nous vous proposons " +
                             data[PRODUCTS["name"]] +
@@ -44,7 +46,7 @@ class Substitute:
                             data[PRODUCTS["store"]]
                         )
                         if input("souhaitez vous enregistrez cette proposition ? y/n :") == "y":
-                            self.db.client_save_product(data[PRODUCTS["id"]])
+                            self.data_base.client_save_product(data[PRODUCTS["id"]])
                             print("sauvegarde")
                         return
                 print("aucun produit de substitution n'a été trouvé")
@@ -53,6 +55,6 @@ class Substitute:
 
     def get_client_data(self):
         """get client substitute products"""
-        data = self.db.client_get_product()
+        data = self.data_base.client_get_product()
         for i in data:
             print("name: " + i[0] + " store: " + i[2] + " score: " + str(i[3]))
