@@ -14,7 +14,7 @@
 ```
 
 ### Require
-Before execute this app install all package below or use requirement.txt
+Before execute this app install all package below or use requirements.txt
 exemple "python -m pip install namePackage" in cmd
 ```
 1 mysql.connector
