@@ -30,6 +30,10 @@ exemple "python -m pip install namePackage" in cmd
 0.3 Adding user interaction
 0.4 Fixing duplicate data and update source to respect PEP8
 0.5 Update to validate project
+0.6 Cat is now based on cat from API
+0.7 Structure update to use more obj
+0.8 Database update
+
 ```
 ## Authors
 
